@@ -4,11 +4,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("DbFirst_NoProcedure")]
+[assembly: AssemblyTitle("DbFirst_Procedural")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("DbFirst_NoProcedure")]
+[assembly: AssemblyProduct("DbFirst_Procedural")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("c2d3d21d-089f-488c-ba6f-afb7235d3a6b")]
+[assembly: Guid("1f196e7b-d147-4d72-a4db-0c4b0946c126")]
 
 // Version information for an assembly consists of the following four values:
 //

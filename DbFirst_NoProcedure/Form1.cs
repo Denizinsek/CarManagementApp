@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -28,7 +27,7 @@ namespace DbFirst_NoProcedure
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Veriler yüklenirken hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowErrorMessage("Veriler yüklenirken hata oluştu", ex);
             }
         }
 
@@ -36,24 +35,16 @@ namespace DbFirst_NoProcedure
         {
             try
             {
-                Car newCar = new Car
-                {
-                    CarSerialNo = Convert.ToInt32(TxtBxCSerialNo.Text),
-                    Brand = TxtBxBrand.Text,
-                    Model = TxtBxModel.Text,
-                    Color = TxtBxColor.Text
-                };
-
+                var newCar = CreateCarFromInput();
                 conn.Cars.Add(newCar);
                 conn.SaveChanges();
-
-                LoadData(); // Verileri yeniden yükle
-
-                MessageBox.Show("Yeni araç başarıyla kaydedildi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadData();
+                ShowSuccessMessage("Yeni araç başarıyla kaydedildi.");
+                ClearInputFields();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Araç kaydedilirken hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowErrorMessage("Araç kaydedilirken hata oluştu", ex);
             }
         }
 
@@ -61,30 +52,24 @@ namespace DbFirst_NoProcedure
         {
             try
             {
-                int id = Convert.ToInt32(TxtBxCSerialNo.Tag);
-                var updateCar = conn.Cars.FirstOrDefault(c => c.Id == id);
+                int carId = GetSelectedCarId();
+                var carToUpdate = conn.Cars.FirstOrDefault(c => c.Id == carId);
 
-                if (updateCar != null)
+                if (carToUpdate != null)
                 {
-                    updateCar.CarSerialNo = Convert.ToInt32(TxtBxCSerialNo.Text);
-                    updateCar.Brand = TxtBxBrand.Text;
-                    updateCar.Model = TxtBxModel.Text;
-                    updateCar.Color = TxtBxColor.Text;
-
+                    UpdateCarFromInput(carToUpdate);
                     conn.SaveChanges();
-
-                    LoadData(); // Verileri yeniden yükle
-
-                    MessageBox.Show("Araç bilgileri başarıyla güncellendi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
+                    ShowSuccessMessage("Araç bilgileri başarıyla güncellendi.");
                 }
                 else
                 {
-                    MessageBox.Show("Güncellenecek araç bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowWarningMessage("Güncellenecek araç bulunamadı.");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Araç güncellenirken hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowErrorMessage("Araç güncellenirken hata oluştu", ex);
             }
         }
 
@@ -92,27 +77,78 @@ namespace DbFirst_NoProcedure
         {
             try
             {
-                int id = Convert.ToInt32(TxtBxCSerialNo.Tag);
-                var deleteCar = conn.Cars.FirstOrDefault(c => c.Id == id);
+                int carId = GetSelectedCarId();
+                var carToDelete = conn.Cars.FirstOrDefault(c => c.Id == carId);
 
-                if (deleteCar != null)
+                if (carToDelete != null)
                 {
-                    conn.Cars.Remove(deleteCar);
+                    conn.Cars.Remove(carToDelete);
                     conn.SaveChanges();
-
-                    LoadData(); // Verileri yeniden yükle
-
-                    MessageBox.Show("Araç başarıyla silindi.", "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
+                    ShowSuccessMessage("Araç başarıyla silindi.");
+                    ClearInputFields();
                 }
                 else
                 {
-                    MessageBox.Show("Silinecek araç bulunamadı.", "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ShowWarningMessage("Silinecek araç bulunamadı.");
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Araç silinirken hata oluştu: " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ShowErrorMessage("Araç silinirken hata oluştu", ex);
             }
+        }
+
+        private Car CreateCarFromInput()
+        {
+            return new Car
+            {
+                CarSerialNo = GetIntFromTextBox(TxtBxCSerialNo),
+                Brand = TxtBxBrand.Text,
+                Model = TxtBxModel.Text,
+                Color = TxtBxColor.Text
+            };
+        }
+
+        private void UpdateCarFromInput(Car car)
+        {
+            car.CarSerialNo = GetIntFromTextBox(TxtBxCSerialNo);
+            car.Brand = TxtBxBrand.Text;
+            car.Model = TxtBxModel.Text;
+            car.Color = TxtBxColor.Text;
+        }
+
+        private int GetSelectedCarId()
+        {
+            return Convert.ToInt32(TxtBxCSerialNo.Tag);
+        }
+
+        private int GetIntFromTextBox(TextBox textBox)
+        {
+            return Convert.ToInt32(textBox.Text);
+        }
+
+        private void ShowSuccessMessage(string message)
+        {
+            MessageBox.Show(message, "Bilgi", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ShowWarningMessage(string message)
+        {
+            MessageBox.Show(message, "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+
+        private void ShowErrorMessage(string message, Exception ex)
+        {
+            MessageBox.Show(message + ": " + ex.Message, "Hata", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void ClearInputFields()
+        {
+            TxtBxCSerialNo.Text = "";
+            TxtBxBrand.Text = "";
+            TxtBxModel.Text = "";
+            TxtBxColor.Text = "";
         }
 
         private void DGridView_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -120,7 +156,6 @@ namespace DbFirst_NoProcedure
             if (e.RowIndex >= 0)
             {
                 DataGridViewRow row = DGridView.Rows[e.RowIndex];
-
                 TxtBxCSerialNo.Tag = row.Cells["Id"].Value.ToString();
                 TxtBxCSerialNo.Text = row.Cells["CarSerialNo"].Value.ToString();
                 TxtBxBrand.Text = row.Cells["Brand"].Value.ToString();

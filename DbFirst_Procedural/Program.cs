@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace DbFirst_NoProcedure
+namespace DbFirst_Procedural
 {
     internal static class Program
     {
